@@ -1,6 +1,6 @@
 """Model of a contract between Buyer,Owner and Real estate agency"""
-from Projekat.models.client.client import Client
-from Projekat.models.properties.property import Property
+from models.client.client import Client
+from models.properties.property import Property
 from datetime import datetime, date
 
 

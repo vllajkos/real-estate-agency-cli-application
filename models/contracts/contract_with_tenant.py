@@ -1,8 +1,8 @@
 """Model of a Contract between Tenant,Owner and Real estate agency"""
-from Projekat.models.client.client import Client
-from Projekat.models.properties.property import Property
+from models.client.client import Client
+from models.properties.property import Property
 from datetime import datetime, date
-from Projekat.functions.utilities import return_expiration_date
+from functions.utilities import return_expiration_date
 
 
 class ContractWithTenant:

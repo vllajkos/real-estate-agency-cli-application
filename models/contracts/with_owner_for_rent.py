@@ -1,7 +1,7 @@
 """Model of a contract with Owner for listing a property on rent"""
-from Projekat.models.properties.property import Property
+from models.properties.property import Property
 from datetime import datetime, date
-from Projekat.functions.utilities import check_float, check_integer, is_valid
+from functions.utilities import check_float, check_integer, is_valid
 
 
 class ContractWithOwnerForRent:

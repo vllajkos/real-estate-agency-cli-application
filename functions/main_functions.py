@@ -1,19 +1,19 @@
 import os
-from Projekat.models.client.client import Client
-from Projekat.models.contracts.contract_with_tenant import ContractWithTenant
-from Projekat.models.contracts.with_owner_for_rent import ContractWithOwnerForRent
-from Projekat.models.properties.office import Office
-from Projekat.models.properties.building import Building
-from Projekat.models.properties.parking_space import ParkingSpace
-from Projekat.functions.utilities import choose_option_from_menu, archive_file, choose_id_return_contract_and_path, \
+from models.client.client import Client
+from models.contracts.contract_with_tenant import ContractWithTenant
+from models.contracts.with_owner_for_rent import ContractWithOwnerForRent
+from models.properties.office import Office
+from models.properties.building import Building
+from models.properties.parking_space import ParkingSpace
+from functions.utilities import choose_option_from_menu, archive_file, choose_id_return_contract_and_path, \
     display_properties_by_type_returns_list_by_type, search_key, save_progress, get_database_path, \
     from_file_return_object, sort_contract_list_by_price, check_conditions
-from Projekat.functions.options_data import TYPE_OF_PROPERTY, NAME_OF_DIRECTORY
-from Projekat.models.properties.apartment import Apartment
-from Projekat.models.properties.land import Land
-from Projekat.models.properties.garage import Garage
-from Projekat.models.contracts.with_owner_for_sale import ContractWithOwnerForSale
-from Projekat.models.contracts.contract_with_buyer import ContractWithBuyer
+from functions.options_data import TYPE_OF_PROPERTY, NAME_OF_DIRECTORY
+from models.properties.apartment import Apartment
+from models.properties.land import Land
+from models.properties.garage import Garage
+from models.contracts.with_owner_for_sale import ContractWithOwnerForSale
+from models.contracts.contract_with_buyer import ContractWithBuyer
 
 
 def put_property_on_sale(directory_name: str) -> bool:

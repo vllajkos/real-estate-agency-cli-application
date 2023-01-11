@@ -1,8 +1,7 @@
 """Abstract class of a Property"""
 from abc import ABC
-from Projekat.models.additional.address import Address
-from Projekat.models.client.client import Client
-
+from models.additional.address import Address
+from models.client.client import Client
 
 class Property(ABC):
     def __init__(self, property_id: str, address: Address, sqm: float, owner: Client):

@@ -1,9 +1,9 @@
 """Model of a Land"""
-from Projekat.models.client.client import Client
-from Projekat.models.properties.property import Property
-from Projekat.functions.options_data import TYPE_OF_LAND
-from Projekat.models.additional.address import Address
-from Projekat.functions.utilities import show_options, choose_option, check_sqm
+from models.client.client import Client
+from models.properties.property import Property
+from functions.options_data import TYPE_OF_LAND
+from models.additional.address import Address
+from functions.utilities import show_options, choose_option, check_sqm
 
 
 class Land(Property):

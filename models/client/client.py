@@ -1,6 +1,6 @@
 """Model of a Client"""
-from Projekat.models.additional.address import Address
-from Projekat.functions.utilities import is_valid
+from models.additional.address import Address
+from functions.utilities import is_valid
 
 class Client:
     def __init__(self, name: str, surname: str, id_number: str, jmbg: str, address: Address, phone_number: str):

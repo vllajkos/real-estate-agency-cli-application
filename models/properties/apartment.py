@@ -1,8 +1,8 @@
 """Model of an Apartment"""
-from Projekat.models.additional.address import Address
-from Projekat.models.client.client import Client
-from Projekat.models.properties.property import Property
-from Projekat.functions.utilities import check_integer, check_sqm, return_bool, check_room
+from models.additional.address import Address
+from models.client.client import Client
+from models.properties.property import Property
+from functions.utilities import check_integer, check_sqm, return_bool, check_room
 
 
 class Apartment(Property):

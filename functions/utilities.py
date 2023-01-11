@@ -1,6 +1,6 @@
 import os
 import pickle
-from Projekat.functions.options_data import TYPE_OF_PROPERTY
+from functions.options_data import TYPE_OF_PROPERTY
 
 
 def is_valid(key: int) -> str | float:

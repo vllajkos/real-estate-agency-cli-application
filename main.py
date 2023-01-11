@@ -1,7 +1,7 @@
-from Projekat.functions.main_functions import put_property_on_sale, put_property_on_rent, buy_property, rent_property, \
+from functions.main_functions import put_property_on_sale, put_property_on_rent, buy_property, rent_property, \
     review_owners_by_m_011, review_properties_to_rent_sorted_by_price, review_sales_contract, review_filtered_apartments
-from Projekat.functions.options_data import MAIN_MENU, NAME_OF_DIRECTORY
-from Projekat.functions.utilities import choose_option_from_menu
+from functions.options_data import MAIN_MENU, NAME_OF_DIRECTORY
+from functions.utilities import choose_option_from_menu
 
 
 def main():
