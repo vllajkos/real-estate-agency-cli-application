@@ -7,7 +7,7 @@ from models.properties.building import Building
 from models.properties.parking_space import ParkingSpace
 from functions.utilities import choose_option_from_menu, archive_file, choose_id_return_contract_and_path, \
     display_properties_by_type_returns_list_by_type, search_key, save_progress, get_database_path, \
-    from_file_return_object, sort_contract_list_by_price, check_conditions
+    from_file_return_object, sort_contract_list_by_price, check_conditions, return_bool
 from functions.options_data import TYPE_OF_PROPERTY, NAME_OF_DIRECTORY
 from models.properties.apartment import Apartment
 from models.properties.land import Land
@@ -16,13 +16,11 @@ from models.contracts.with_owner_for_sale import ContractWithOwnerForSale
 from models.contracts.contract_with_buyer import ContractWithBuyer
 
 
-def put_property_on_sale(directory_name: str) -> bool:
-    """Creates contract between owner and real estate agency for listing property on sale"""
+def list_property(directory_name: str) -> bool:
+    """Creates contract between owner and real estate agency for listing a property on sale/rent"""
     option = choose_option_from_menu(TYPE_OF_PROPERTY)
-    # for chosen option creates property
+    # for chosen type creates property
     match option:
-        case 0:
-            return False
         case 1:
             real_estate = Land.create()
         case 2:
@@ -37,45 +35,29 @@ def put_property_on_sale(directory_name: str) -> bool:
             real_estate = ParkingSpace.create()
         case other:
             return False
-    contract = ContractWithOwnerForSale.create(real_estate)
-    save_progress(directory_name, contract)
-    return True
+    if directory_name == NAME_OF_DIRECTORY[1]:
+        contract = ContractWithOwnerForSale.create(real_estate)
+    else:
+        contract = ContractWithOwnerForRent.create(real_estate)
+    print(contract)
+    print("Sign contract?")
+    if return_bool():
+        save_progress(directory_name, contract)
+        return True
 
 
-def put_property_on_rent(directory_name: str) -> bool:
-    """Creates contract between owner and real estate agency for listing property for rent"""
-    option = choose_option_from_menu(TYPE_OF_PROPERTY)
-    # for chosen option creates property
-    match option:
-        case 0:
-            return False
-        case 1:
-            real_estate = Land.create()
-        case 2:
-            real_estate = Apartment.create()
-        case 3:
-            real_estate = Building.create()
-        case 4:
-            real_estate = Office.create()
-        case 5:
-            real_estate = Garage.create()
-        case 6:
-            real_estate = ParkingSpace.create()
-        case other:
-            return False
-    contract = ContractWithOwnerForRent.create(real_estate)
-    save_progress(directory_name, contract)
-    return True
-
-
-def buy_property(directory_name: str) -> None | bool:
-    """Creates sale contract between buyer,owner and real estate agency"""
+def buy_rent_property(directory_name: str) -> None | bool:
+    """Creates contract for sale/rent between client, owner and real estate agency"""
+    if directory_name == NAME_OF_DIRECTORY[3]:
+        search_directory_name = NAME_OF_DIRECTORY[1]
+    else:
+        search_directory_name = NAME_OF_DIRECTORY[2]
     while True:
         # prompts user for type of property to buy or to return to previous menu
         search_keyword = search_key()
         if search_keyword == 0:
             break
-        path_list = display_properties_by_type_returns_list_by_type(NAME_OF_DIRECTORY[1], search_keyword)
+        path_list = display_properties_by_type_returns_list_by_type(search_directory_name, search_keyword)
         # if there is no directory for chosen type of property exits
         if path_list is False:
             break
@@ -87,55 +69,33 @@ def buy_property(directory_name: str) -> None | bool:
             if option is not False:
                 # creating sale contract
                 contract, path = option
-                print("New owner details")
-                new_owner = Client.create()
-                real_estate = contract.get_real_estate()
+                if directory_name == NAME_OF_DIRECTORY[3]:
+                    print("New owner details")
+                    new_owner = Client.create()
+                    real_estate = contract.get_real_estate()
 
-                previous_owner = real_estate.get_owner()
-                # changing owner
-                real_estate.change_owner(new_owner)
-                new_contract = ContractWithBuyer(real_estate, previous_owner,
-                                                 contract.get_price(),
-                                                 contract.get_fee())
+                    previous_owner = real_estate.get_owner()
+                    # changing owner
+                    real_estate.change_owner(new_owner)
+                    new_contract = ContractWithBuyer(real_estate, previous_owner,
+                                                     contract.get_price(),
+                                                     contract.get_fee())
+
+                else:
+                    print("Tenant details")
+                    tenant = Client.create()
+                    new_contract = ContractWithTenant(contract.get_real_estate(), tenant, contract.get_time_span(),
+                                                      contract.get_monthly_expenses(), contract.get_price(),
+                                                      contract.get_fee())
                 print(new_contract)
-                save_progress(directory_name, new_contract)
-                archive_file(path)
-                return True
+                print("Sign contract?")
+                if return_bool():
+                    save_progress(directory_name, new_contract)
+                    archive_file(path)
+                    return True
         else:
-            print("There are no properties of chosen type on sale\nChose other type of property or return to main menu")
-
-
-def rent_property(directory_name: str) -> None | bool:
-    """Creates rent contract between tenant,owner and real estate agency"""
-    while True:
-        # prompts user for type of property to buy or to return to previous menu
-        search_keyword = search_key()
-
-        if search_keyword == 0:
-            break
-        path_list = display_properties_by_type_returns_list_by_type(NAME_OF_DIRECTORY[2], search_keyword)
-        # if there is no directory for chosen type of property exits
-        if path_list is False:
-            break
-        if bool(path_list):
-            # if there are properties listed for rent prompts user to choose one of the contract id presented
-            # or to return to previous menu
-            option = choose_id_return_contract_and_path(path_list)
-            if option is not False:
-                # creates renting contract
-                contract, path = option
-                print("Tenant details")
-                tenant = Client.create()
-                new_contract = ContractWithTenant(contract.get_real_estate(), tenant, contract.get_time_span(),
-                                                  contract.get_monthly_expenses(), contract.get_price(),
-                                                  contract.get_fee())
-                print(new_contract)
-                save_progress(directory_name, new_contract)
-                archive_file(path)
-                return True
-        else:
-            print("There are no properties of chosen type to rent\nChose other type of property or return to main menu")
-
+            print("There are no properties of chosen type on sale/rent\n"
+                  "Chose other type of property or return to Main Menu")
 
 def review_owners_by_m_011() -> None:
     """Listing filtered owners by certain conditions"""
