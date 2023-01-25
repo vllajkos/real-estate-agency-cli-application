@@ -7,7 +7,7 @@ from models.properties.building import Building
 from models.properties.parking_space import ParkingSpace
 from functions.utilities import choose_option_from_menu, archive_file, choose_id_return_contract_and_path, \
     display_properties_by_type_returns_list_by_type, search_key, save_progress, get_database_path, \
-    from_file_return_object, sort_contract_list_by_price, check_conditions, return_bool
+    from_file_return_object, sort_contract_list_by_price, check_conditions, is_yes
 from functions.options_data import TYPE_OF_PROPERTY, NAME_OF_DIRECTORY
 from models.properties.apartment import Apartment
 from models.properties.land import Land
@@ -41,7 +41,7 @@ def list_property(directory_name: str) -> bool:
         contract = ContractWithOwnerForRent.create(real_estate)
     print(contract)
     print("Sign contract?")
-    if return_bool():
+    if is_yes():
         save_progress(directory_name, contract)
         return True
 
@@ -89,7 +89,7 @@ def buy_rent_property(directory_name: str) -> None | bool:
                                                       contract.get_fee())
                 print(new_contract)
                 print("Sign contract?")
-                if return_bool():
+                if is_yes():
                     save_progress(directory_name, new_contract)
                     archive_file(path)
                     return True

@@ -2,6 +2,10 @@ import os
 import pickle
 from functions.options_data import TYPE_OF_PROPERTY
 
+"""
+FUNCTIONS FOR VALIDATION OF CONDITIONS
+"""
+
 
 def is_valid(key: int) -> str | float:
     """Validate different inputs by key"""
@@ -64,20 +68,6 @@ def check_sqm() -> float:
     return sqm
 
 
-def return_bool() -> bool:
-    """Prompts user for input, checks if input satisfy conditions"""
-    while True:
-        user_input = input("Enter yes or no: ").lower()
-        if user_input == "yes":
-            option = True
-            return option
-        elif user_input == "no":
-            option = False
-            return option
-        else:
-            print("Please enter yes or no as an option choice")
-
-
 def check_float() -> float:
     """Prompts user for input, checks if input satisfy conditions"""
     while True:
@@ -101,6 +91,50 @@ def check_integer() -> int:
             return integer
         except ValueError:
             print("Wrong input value, try again")
+
+
+def is_yes() -> bool:
+    """Prompts user for input, checks if input satisfy conditions"""
+    while True:
+        user_input = input("Enter yes or no: ").lower()
+        if user_input == "yes":
+            option = True
+            return option
+        elif user_input == "no":
+            option = False
+            return option
+        else:
+            print("Please enter yes or no as an option choice")
+
+
+def return_expiration_date(signing_date: str, time_span: int) -> str:
+    """Creates expiration date"""
+    date: list = signing_date.split("-")
+    year = int(date[0])
+    month = int(date[1]) + time_span
+    day = date[2]
+    while month > 12:
+        month = month - 12
+        year += 1
+    return f"{year}-{month}-{day}"
+
+
+def check_conditions(real_estate) -> bool:
+    """Checks if property satisfy given conditions"""
+    if real_estate.get_terrace() is True and \
+            real_estate.get_air_conditioning() is True and \
+            real_estate.get_parking_space() and \
+            real_estate.get_sqm() > 50 and \
+            real_estate.get_floor() > 2 and \
+            real_estate.get_address().get_city().lower() == "nis" and \
+            real_estate.get_address().get_country().lower() == "srbija":
+        return True
+    return False
+
+
+"""
+FUNCTIONS FOR PRINTING OPTIONS AND RECEIVING AN OPTION
+"""
 
 
 def show_options(main_menu: dict) -> None:
@@ -141,6 +175,11 @@ def choose_option_from_menu(menu: dict) -> int:
         continue
 
 
+"""
+FUNCTIONS FOR FILE-BASED DATA MANAGEMENT SYSTEM
+"""
+
+
 def create_database() -> None:
     """Create database"""
     try:
@@ -164,10 +203,34 @@ def create_directory(dir_name: str) -> str:
     return dir_path
 
 
-"""Koristio sam pickle modul za serializaciju i deserializaciju objekta.
-Objekat prebacujem u bajtove i njih upisujem u fajl, a kasnije citanjem
-iz fajla vracam objekat, imao sam problema sa json modulom pa sam probao
-na ovaj nacin i radi."""
+def archive_file(path) -> None:
+    """Moves file from original directory to archive"""
+    contract = from_file_return_object(path)
+    os.remove(path)
+    create_database()
+    new_path = create_directory("archive")
+    object_to_file(contract, new_path)
+
+
+def save_progress(directory_name: str, contract) -> None:
+    """Creates database if database do not exist, creates directory for type of contract if directory do not exist,
+    writes object to file"""
+    create_database()
+    path = create_directory(directory_name)
+    object_to_file(contract, path)
+
+
+"""
+FUNCTIONS FOR SERIALIZATION AND DESERIALIZATION OF AN OBJECT
+"""
+
+
+def create_contract_name(contract) -> str:
+    """Creates unique contract name"""
+    contract_name = ""
+    contract_name += contract.get_real_estate().__class__.__name__ + " "
+    contract_name += contract.get_id()
+    return contract_name
 
 
 def object_to_file(contract, path: str) -> None:
@@ -184,48 +247,9 @@ def from_file_return_object(path: str):
         return pickle.loads(f.read())
 
 
-def return_expiration_date(signing_date: str, time_span: int) -> str:
-    """Creates expiration date"""
-    date: list = signing_date.split("-")
-    year = int(date[0])
-    month = int(date[1]) + time_span
-    day = date[2]
-    while month > 12:
-        month = month - 12
-        year += 1
-    return f"{year}-{month}-{day}"
-
-
-def create_contract_name(contract) -> str:
-    """Creates unique contract name"""
-    contract_name = ""
-    contract_name += contract.get_real_estate().__class__.__name__ + " "
-    contract_name += contract.get_id()
-    return contract_name
-
-
-def archive_file(path) -> None:
-    """Moves file from original directory to archive"""
-    contract = from_file_return_object(path)
-    os.remove(path)
-    create_database()
-    new_path = create_directory("archive")
-    object_to_file(contract, new_path)
-
-
-def choose_id_return_contract_and_path(path_list) -> bool | tuple:
-    """Prompts user for input and checks if input satisfy conditions  """
-    while True:
-        option = input("Enter contract id for property you want to purchase/rent or 0 to return to previous menu: ")
-        if option == "0":
-            print("Chosen option >> return to previous menu")
-            return False
-        for path in path_list:
-            contract = from_file_return_object(path)
-            if contract.get_id() == option:
-                #  returns contract and path to it
-                return contract, path
-        print("You have entered wrong id, try again")
+"""
+FUNCTIONS FOR LISTING CONTRACTS FROM GIVEN DIRECTORIES AND CHOOSING DESIRED PROPERTY 
+"""
 
 
 def search_key() -> int | str:
@@ -259,12 +283,24 @@ def display_properties_by_type_returns_list_by_type(directory_name: str, search_
     return path_list
 
 
-def save_progress(directory_name: str, contract) -> None:
-    """Creates database if database do not exist, creates directory for type of contract if directory do not exist,
-    writes object to file"""
-    create_database()
-    path = create_directory(directory_name)
-    object_to_file(contract, path)
+def choose_id_return_contract_and_path(path_list) -> bool | tuple:
+    """Prompts user for input and checks if input satisfy conditions  """
+    while True:
+        option = input("Enter contract id for property you want to purchase/rent or 0 to return to previous menu: ")
+        if option == "0":
+            print("Chosen option >> return to previous menu")
+            return False
+        for path in path_list:
+            contract = from_file_return_object(path)
+            if contract.get_id() == option:
+                #  returns contract and path to it
+                return contract, path
+        print("You have entered wrong id, try again")
+
+
+"""
+SORTING FUNCTION
+"""
 
 
 def sort_contract_list_by_price(contract_list) -> list:
@@ -287,16 +323,3 @@ def sort_contract_list_by_price(contract_list) -> list:
             else:
                 srt = True
     return contract_list
-
-
-def check_conditions(real_estate) -> bool:
-    """Checks if property satisfy given conditions"""
-    if real_estate.get_terrace() is True and \
-            real_estate.get_air_conditioning() is True and \
-            real_estate.get_parking_space() and \
-            real_estate.get_sqm() > 50 and \
-            real_estate.get_floor() > 2 and \
-            real_estate.get_address().get_city().lower() == "nis" and \
-            real_estate.get_address().get_country().lower() == "srbija":
-        return True
-    return False

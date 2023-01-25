@@ -2,7 +2,7 @@
 from models.additional.address import Address
 from models.client.client import Client
 from models.properties.property import Property
-from functions.utilities import check_sqm, check_integer, return_bool
+from functions.utilities import check_sqm, check_integer, is_yes
 
 
 class Office(Property):
@@ -67,11 +67,11 @@ class Office(Property):
         print("Enter number of available parking spaces for employees")
         parking_space = check_integer()
         print("Terrace?")
-        terrace = return_bool()
+        terrace = is_yes()
         print("Air conditioning?")
-        air_conditioning = return_bool()
+        air_conditioning = is_yes()
         print("Heating?")
-        heating = return_bool()
+        heating = is_yes()
         address = Address.create()
         owner = Client.create()
         return cls(property_id, address, sqm, owner, office_number, number_of_offices, terrace, parking_space,

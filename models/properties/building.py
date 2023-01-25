@@ -2,7 +2,7 @@
 from models.additional.address import Address
 from models.client.client import Client
 from models.properties.property import Property
-from functions.utilities import check_sqm, check_integer, return_bool
+from functions.utilities import check_sqm, check_integer, is_yes
 
 
 class Building(Property):
@@ -52,9 +52,9 @@ class Building(Property):
         print("Enter number of apartments")
         num_of_apartments = check_integer()
         print("Does a building have an elevator?")
-        elevator = return_bool()
+        elevator = is_yes()
         print("Does a building have a garage?")
-        garage = return_bool()
+        garage = is_yes()
         address = Address.create()
         owner = Client.create()
         return cls(property_id, address, sqm, num_of_floors, num_of_apartments, owner, elevator, garage)
