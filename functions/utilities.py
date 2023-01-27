@@ -96,15 +96,15 @@ def check_integer() -> int:
 def is_yes() -> bool:
     """Prompts user for input, checks if input satisfy conditions"""
     while True:
-        user_input = input("Enter yes or no: ").lower()
-        if user_input == "yes":
+        user_input = input("Y/N: ").lower()
+        if user_input == "y":
             option = True
             return option
-        elif user_input == "no":
+        elif user_input == "n":
             option = False
             return option
         else:
-            print("Please enter yes or no as an option choice")
+            print("Please enter Y for Yes or N for No")
 
 
 def return_expiration_date(signing_date: str, time_span: int) -> str:
@@ -121,15 +121,21 @@ def return_expiration_date(signing_date: str, time_span: int) -> str:
 
 def check_conditions(real_estate) -> bool:
     """Checks if property satisfy given conditions"""
-    if real_estate.get_terrace() is True and \
-            real_estate.get_air_conditioning() is True and \
-            real_estate.get_parking_space() and \
-            real_estate.get_sqm() > 50 and \
-            real_estate.get_floor() > 2 and \
-            real_estate.get_address().get_city().lower() == "nis" and \
-            real_estate.get_address().get_country().lower() == "srbija":
-        return True
-    return False
+    if not real_estate.get_terrace():
+        return False
+    if not real_estate.get_air_conditioning():
+        return False
+    if not real_estate.get_parking_space():
+        return False
+    if real_estate.get_sqm() <= 50:
+        return False
+    if real_estate.get_floor() <= 2:
+        return False
+    if real_estate.get_address().get_city().lower() != "nis":
+        return False
+    if real_estate.get_address().get_country().lower() != "srbija":
+        return False
+    return True
 
 
 """
@@ -151,28 +157,16 @@ def choose_option(menu: dict) -> int:
         except ValueError:
             print("Enter the number for given options")
             continue
-        if 0 < option <= len(menu):
+        if option in menu.keys():
+            print(f"Chosen option >> {menu.get(option)}")
             return option
-        else:
-            print("Choose valid option number! Try again")
-            continue
+        print("Choose valid option number! Try again")
 
 
 def choose_option_from_menu(menu: dict) -> int:
-    """Prompts user for input, checks if input satisfy conditions"""
-    print("MENU")
+    """Prompts user for input, checks if input satisfy conditions, returns option"""
     show_options(menu)
-    while True:
-        try:
-            option = int(input("Choose option number: "))
-        except ValueError:
-            print("Enter the number for given options")
-            continue
-        if option in menu.keys():
-            print(f"Chosen option >> {menu[option]}")
-            return option
-        print("Choose valid option number! Try again")
-        continue
+    return choose_option(menu)
 
 
 """
@@ -195,7 +189,7 @@ def get_database_path() -> str:
 
 def create_directory(dir_name: str) -> str:
     """Creates directory inside database for type of contract"""
-    dir_path = os.path.join(os.getcwd(), "database", dir_name)
+    dir_path = os.path.join(get_database_path(), dir_name)
     try:
         os.mkdir(dir_path)
     except OSError:
@@ -203,40 +197,16 @@ def create_directory(dir_name: str) -> str:
     return dir_path
 
 
-def archive_file(path) -> None:
-    """Moves file from original directory to archive"""
-    contract = from_file_return_object(path)
-    os.remove(path)
-    create_database()
-    new_path = create_directory("archive")
-    object_to_file(contract, new_path)
-
-
-def save_progress(directory_name: str, contract) -> None:
-    """Creates database if database do not exist, creates directory for type of contract if directory do not exist,
-    writes object to file"""
-    create_database()
-    path = create_directory(directory_name)
-    object_to_file(contract, path)
-
-
-"""
-FUNCTIONS FOR SERIALIZATION AND DESERIALIZATION OF AN OBJECT
-"""
-
-
 def create_contract_name(contract) -> str:
     """Creates unique contract name"""
-    contract_name = ""
-    contract_name += contract.get_real_estate().__class__.__name__ + " "
-    contract_name += contract.get_id()
+    contract_name = contract.get_real_estate().__class__.__name__.lower() + "-" + contract.get_id() + ".txt"
     return contract_name
 
 
 def object_to_file(contract, path: str) -> None:
     """Serialize object as bytes and write it to .txt file"""
     content = pickle.dumps(contract)
-    name = os.path.join(path, create_contract_name(contract) + ".txt")
+    name = os.path.join(path, create_contract_name(contract))
     with open(name, "wb") as f:
         f.write(content)
 
@@ -247,6 +217,22 @@ def from_file_return_object(path: str):
         return pickle.loads(f.read())
 
 
+def archive_contract(path) -> None:
+    """Moves file from original directory to archive"""
+    contract = from_file_return_object(path)
+    os.remove(path)
+    new_path = create_directory("archive")
+    object_to_file(contract, new_path)
+
+
+def save_contract(directory_name: str, contract) -> None:
+    """Creates database if database do not exist, creates directory for type of contract if directory do not exist,
+    writes object to file"""
+    create_database()
+    path = create_directory(directory_name)
+    object_to_file(contract, path)
+
+
 """
 FUNCTIONS FOR LISTING CONTRACTS FROM GIVEN DIRECTORIES AND CHOOSING DESIRED PROPERTY 
 """
@@ -254,47 +240,47 @@ FUNCTIONS FOR LISTING CONTRACTS FROM GIVEN DIRECTORIES AND CHOOSING DESIRED PROP
 
 def search_key() -> int | str:
     """Returns chosen option"""
+    print("CHOOSE TYPE OF PROPERTY")
     option = choose_option_from_menu(TYPE_OF_PROPERTY)
     if option == 0:
+        print("Chosen option >> Return to Main Menu")
         # returns 0 to go back to previous menu
         return option
     # from dict returns chosen property type to search file names for
-    return TYPE_OF_PROPERTY[option]
+    return TYPE_OF_PROPERTY.get(option)
 
 
-def display_properties_by_type_returns_list_by_type(directory_name: str, search_keyword: str) -> bool | list[str]:
-    """Lists properties filtered by type and returns list of paths of filtered contracts"""
+def choose_property(directory_name: str, search_keyword: str) -> None | tuple:
+    """Show's properties for chosen type of property, if client decides to sign contract with agency and owner,
+    returns previous contract between agency and owner and path to its location"""
     try:
-        path = os.path.join(os.getcwd(), "database", directory_name)
-        file_list = os.listdir(path)
+        path = os.path.join(get_database_path(), directory_name)
+        filename_list = os.listdir(path)
     except OSError:
-        print("There are no properties listed on sale")
-        return False
-    path_list = []
+        raise Exception(f"There are no properties listed {directory_name.split('-', 1)[1].replace('-', ' ')}")
+    contracts_dict = {}
     i = 0
-    for file in file_list:
-        contract = from_file_return_object(os.path.join(path, file))
-        # checks if type of property matches chosen type
-        if contract.get_real_estate().__class__.__name__ == search_keyword:
-            path_list.append(os.path.join(path, file))
+    for filename in filename_list:
+        # checks if file name contains chosen type of property
+        if filename.split("-")[0] == search_keyword.lower().replace(" ", ""):
+            contract_path = os.path.join(path, filename)
+            contract = from_file_return_object(contract_path)
+            contracts_dict.setdefault(filename.split("-")[1].split(".")[0], contract_path)
             print(contract)
             i += 1
     print(f"\nSearch result: {i}")
-    return path_list
-
-
-def choose_id_return_contract_and_path(path_list) -> bool | tuple:
-    """Prompts user for input and checks if input satisfy conditions  """
+    if i == 0:
+        print(f"No {search_keyword} listed {directory_name.split('-', 1)[1].replace('-', ' ')}\n"
+              "Choose different type of property or return to Main Menu")
+        return
     while True:
-        option = input("Enter contract id for property you want to purchase/rent or 0 to return to previous menu: ")
+        option = input("Enter contract ID to begin the process of signing a contract or 0 to return to previous Menu: ")
         if option == "0":
-            print("Chosen option >> return to previous menu")
-            return False
-        for path in path_list:
-            contract = from_file_return_object(path)
-            if contract.get_id() == option:
-                #  returns contract and path to it
-                return contract, path
+            print("Chosen option >> Return to previous Menu")
+            return
+        if option in contracts_dict.keys():
+            contract_path = contracts_dict.get(option)
+            return from_file_return_object(contract_path), contract_path
         print("You have entered wrong id, try again")
 
 
@@ -312,14 +298,11 @@ def sort_contract_list_by_price(contract_list) -> list:
             if i < len(contract_list) - 1:
                 if contract_list[i].get_price() > contract_list[i + 1].get_price():
                     contract_list[i], contract_list[i + 1] = contract_list[i + 1], contract_list[i]
-
         else:
             j += 1
             for i in range(len(contract_list) - 1):
                 if contract_list[i].get_price() > contract_list[i + 1].get_price():
                     break
-                else:
-                    continue
             else:
                 srt = True
     return contract_list

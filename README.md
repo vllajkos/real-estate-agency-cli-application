@@ -11,7 +11,7 @@ SKLAPANJE UGOVORA IZMEDJU VLASNIKA NEKRETNINE I AGENCIJE O OGLASAVANJU NEKRETNIN
 Nakon odabira ove opcije trazi se unos podataka o samoj nekretnini, zatim podataka o vlasniku nekretnine,
 zatim ceni i agencijskoj proviziji.
 
-Ugovor se cuva u direktorijumu "properties on sale".
+Ugovor se cuva u direktorijumu "properties-on-sale".
 
 
 
@@ -23,7 +23,7 @@ Nakon odabira ove opcije trazi se unos podataka o samoj nekretnini, zatim podata
 zatim o vremenskom periodu na kome bi se izdala nekretnina, mesecnim troskovima odrzavanja, ceni kirije,
 i agencijskoj proviziji.
 
-Ugovor se cuva u direktorijumu "properties to rent".
+Ugovor se cuva u direktorijumu "properties-to-rent".
 
 
 
@@ -38,7 +38,7 @@ pristupa se podacima izabrane nekretnine i zapocinje se proces kupoprodaje.
 Trazice se unos podataka kupca, sklopice se ugovor o kupoprodaji i prenece se vlasnistvo na njega.
 
 Ugovor se cuva u direktorijumu "sold properties" a stari ugovor sklopljen izmedju prethodnog vlasnika i agencije bice
-uklonjen iz direktorijuma "properties on sale" i premesten u direktorijum "archive".
+uklonjen iz direktorijuma "properties-on-sale" i premesten u direktorijum "archive".
 
 
 
@@ -54,7 +54,7 @@ pristupa se podacima izabrane nekretnine i zapocinje se proces iznajmljivanja.
 Trazice se unos podataka zakupca i sklopice se ugovor o iznajmljivanju.
 
 Ugovor se cuva u direktorijumu "rented properties" a stari ugovor sklopljen izmedju vlasnika i agencije bice
-uklonjen iz direktorijuma "properties to rent" i premesten u direktorijum "archive".
+uklonjen iz direktorijuma "properties-to-rent" i premesten u direktorijum "archive".
 
 
 

@@ -3,7 +3,7 @@ from models.client.client import Client
 from models.properties.property import Property
 from functions.options_data import TYPE_OF_LAND
 from models.additional.address import Address
-from functions.utilities import show_options, choose_option, check_sqm
+from functions.utilities import show_options, check_sqm, choose_option_from_menu
 
 
 class Land(Property):
@@ -28,8 +28,7 @@ class Land(Property):
     def create(cls):
         print("Fill land details")
         property_id = input("Enter property id: ")
-        show_options(TYPE_OF_LAND)
-        type_of_land = choose_option(TYPE_OF_LAND)
+        type_of_land = choose_option_from_menu(TYPE_OF_LAND)
         sqm = check_sqm()
         address = Address.create()
         owner = Client.create()

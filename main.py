@@ -1,4 +1,4 @@
-from functions.main_functions import list_property,buy_rent_property, \
+from functions.main_functions import list_property, buy_rent_property, \
     review_owners_by_m_011, review_properties_to_rent_sorted_by_price, review_sales_contract, \
     review_filtered_apartments
 from functions.options_data import MAIN_MENU, NAME_OF_DIRECTORY
@@ -7,11 +7,12 @@ from functions.utilities import choose_option_from_menu
 
 def main():
     while True:
+        print("MAIN MENU")
         option = choose_option_from_menu(MAIN_MENU)
         match option:
             case 0:
                 print("Program closed")
-                break
+                return
             case 1:
                 if list_property(NAME_OF_DIRECTORY[option]):
                     print("You have successfully listed your property on sale")

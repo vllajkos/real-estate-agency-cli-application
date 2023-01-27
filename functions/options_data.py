@@ -16,9 +16,9 @@ TYPE_OF_PROPERTY = {1: "Land",
                     4: "Office",
                     5: "Garage",
                     6: "Parking space",
-                    0: "Return to main menu"}
+                    0: "Return to Main Menu"}
 
-NAME_OF_DIRECTORY = {1: "properties on sale",
-                     2: "properties to rent",
-                     3: "sold properties",
-                     4: "rented properties"}
+NAME_OF_DIRECTORY = {1: "properties-on-sale",
+                     2: "properties-to-rent",
+                     3: "sold-properties",
+                     4: "rented-properties"}
