@@ -6,7 +6,6 @@ from functions.utilities import check_integer, check_sqm
 
 
 class ParkingSpace(Property):
-
     def __init__(self, property_id: str, address: Address, parking_space_num: int, sqm: float,
                  owner: Client):
         super().__init__(property_id, address, sqm, owner)

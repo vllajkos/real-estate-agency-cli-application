@@ -99,9 +99,7 @@ def review_owners_by_m_011() -> None:
         except OSError:
             # if there is no directory of given name continues to another
             continue
-        if bool(file_name_list) is False:
-            continue
-        else:
+        if file_name_list:
             # if there are contracts in directory it filters it by conditions
             for file_name in file_name_list:
                 # returns contract object from file
@@ -123,22 +121,22 @@ def review_properties_to_rent_sorted_by_price() -> None:
     except OSError:
         print("No properties listed for renting\n")
         return
-    if bool(file_name_list) is False:
-        print("No properties listed for renting\n")
-        return
-    list_of_contracts = []
-    # creates list of contracts
-    for file_name in file_name_list:
-        list_of_contracts.append(from_file_return_object(os.path.join(get_database_path(), NAME_OF_DIRECTORY[2],
-                                                                      file_name)))
-    # sorts list of contracts by price starting from the lowest price
-    list_of_contracts = sort_contract_list_by_price(list_of_contracts)
+    if file_name_list:
+        list_of_contracts = []
+        # creates list of contracts
+        for file_name in file_name_list:
+            list_of_contracts.append(from_file_return_object(os.path.join(get_database_path(), NAME_OF_DIRECTORY[2],
+                                                                          file_name)))
+        # sorts list of contracts by price starting from the lowest price
+        list_of_contracts = sort_contract_list_by_price(list_of_contracts)
 
-    for i in range(len(list_of_contracts)):
-        print(f"Property and owner's information\n\n{list_of_contracts[i].get_real_estate()}\n"
-              f"\nPrice >>> {list_of_contracts[i].get_price()} $\n")
-        i += 1
-    print(f"\nSearch result: {i}")
+        for j in range(len(list_of_contracts)):
+            print(f"Property and owner's information\n\n{list_of_contracts[j].get_real_estate()}\n"
+                  f"\nPrice >>> {list_of_contracts[j].get_price()} $\n")
+            i += 1
+        print(f"\nSearch result: {i}")
+        return
+    print("No properties listed for renting\n")
 
 
 def review_sales_contract(year: str = "2023") -> None:
@@ -153,22 +151,22 @@ def review_sales_contract(year: str = "2023") -> None:
     except OSError:
         print("There are no sold properties yet\n")
         return
-    if bool(file_name_list) is False:
-        print("There are no sold properties yet\n")
+    if file_name_list:
+        for file_name in file_name_list:
+            contract = from_file_return_object(os.path.join(get_database_path(), NAME_OF_DIRECTORY[3], file_name))
+            # if it meets conditions
+            if contract.get_date()[:4] == year:
+                print(  # Parking space is printed as ParkingSpace
+                    f"Property type: {contract.get_real_estate().__class__.__name__}\n"
+                    f"Current owner : {contract.get_real_estate().get_owner().get_name()} "
+                    f"{contract.get_real_estate().get_owner().get_surname()}\n"
+                    f"Previous owner : {contract.get_previous_owner().get_name()} "
+                    f"{contract.get_previous_owner().get_surname()}\n"
+                    f"Sold for: {contract.get_price()} $\n")
+            i += 1
+        print(f"\nSearch result: {i}")
         return
-    for file_name in file_name_list:
-        contract = from_file_return_object(os.path.join(get_database_path(), NAME_OF_DIRECTORY[3], file_name))
-        # if meets conditions
-        if contract.get_date()[:4] == year:
-            print(
-                f"Property type: {contract.get_real_estate().__class__.__name__}\n"
-                f"Current owner : {contract.get_real_estate().get_owner().get_name()} "
-                f"{contract.get_real_estate().get_owner().get_surname()}\n"
-                f"Previous owner : {contract.get_previous_owner().get_name()} "
-                f"{contract.get_previous_owner().get_surname()}\n"
-                f"Sold for: {contract.get_price()} $\n")
-        i += 1
-    print(f"\nSearch result: {i}")
+    print("There are no sold properties yet\n")
 
 
 def review_filtered_apartments() -> None:
@@ -182,16 +180,15 @@ def review_filtered_apartments() -> None:
     except OSError:
         print("There are no properties on sale yet\n")
         return
-    if bool(file_name_list) is False:
-        print("There are no properties on sale yet\n")
+    if file_name_list:
+        for file_name in file_name_list:
+            if file_name.split("-")[0] == TYPE_OF_PROPERTY[2].lower():
+                contract = from_file_return_object(os.path.join(get_database_path(), NAME_OF_DIRECTORY[1], file_name))
+                if check_conditions(contract.get_real_estate()):
+                    print(f"Apartment owner: {contract.get_real_estate().get_owner().get_name()} "
+                          f"{contract.get_real_estate().get_owner().get_surname()}\n"
+                          f"Apartment selling for >> {contract.get_price()} $")
+                    i += 1
+        print(f"\nSearch result: {i}")
         return
-    for file_name in file_name_list:
-        contract = from_file_return_object(os.path.join(get_database_path(), NAME_OF_DIRECTORY[1], file_name))
-        # if contract is for an apartment
-        if contract.get_real_estate().__class__.__name__ == TYPE_OF_PROPERTY[2] and \
-                check_conditions(contract.get_real_estate()):
-            print(f"Apartment owner: {contract.get_real_estate().get_owner().get_name()} "
-                  f"{contract.get_real_estate().get_owner().get_surname()}\n"
-                  f"Apartment selling for >> {contract.get_price()} $")
-            i += 1
-    print(f"\nSearch result: {i}")
+    print("There are no properties on sale yet\n")
